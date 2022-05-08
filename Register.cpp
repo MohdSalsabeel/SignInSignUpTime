@@ -4,6 +4,7 @@
 #include<limits>
 #include<conio.h>
 #include<ctime>
+#include<time.h>
 #include<fstream>
 //#include <windows.h>
 #include "encrypted.h"
@@ -96,16 +97,19 @@ string Register::RegisterPage(){
             fstream database_file;
             database_file.open("databaseRecordtest.txt",ios::out | ios::app | ios::in);
 
+            fstream log_file;
+            log_file.open("logfiletest.txt",ios::out | ios::app | ios::in);
+
             if(database_file.is_open())
             {
-            
+
 
             //top_user_name:
 
             cout<<"Enter the user name:"<<endl;
             //cin.ignore();
-            
-            
+
+
             getline(cin,obj.user_name);
             cout<<endl;
             for(int i=0;i<obj.user_name.size();i++){
@@ -115,8 +119,8 @@ string Register::RegisterPage(){
                     //break;
                 }
             }
-            
-            
+
+
 
             if(containsOnlyLetters(obj.user_name)){
                 goto user_name_bottom_loop;
@@ -145,7 +149,7 @@ string Register::RegisterPage(){
             cin>>obj.mobile_no_int;
 
             cin.ignore(numeric_limits<streamsize>::max(),'\n');
-            
+
             //bottom_mobile:
 
             // string str;
@@ -195,7 +199,7 @@ string Register::RegisterPage(){
 
             for (int i = 0; i<obj.user_id.size(); i++)
             {
-                
+
                 if (!isalnum(obj.user_id[i]))
                 {
                     cout << obj.user_id[i] << " is not alphanumeric" << endl;
@@ -208,9 +212,9 @@ string Register::RegisterPage(){
             database_file.close();
             database_file.open("databaseRecordtest.txt",ios::in);
             while(database_file>>user_name1>>mobile_no1>>user_id1>>email_id1>>password1>>pin1>>imei_no1>>location1>>time1){
-                if(encrypt(user_id)==user_id1){
+                if(encrypt(obj.user_id)==user_id1){
                     cout<<"user id must be different"<<endl;
-                    goto loop;  // It will goto sign up page
+                    goto user_id_loop;  // It will goto sign up page
                     break;
                 }
             }
@@ -257,7 +261,7 @@ string Register::RegisterPage(){
             cout<<"Enter the password:"<<endl;
             //cin>>obj.password;
 
-            
+
             obj.password=asterik(obj.password);
 
 
@@ -270,6 +274,7 @@ string Register::RegisterPage(){
                 goto specialCharaterBottom;
             }
             else{
+                cout<<'\n';
                 cout<<"Password must be greater than 8 character"<<endl;
                 goto specialLoop;
             }
@@ -280,7 +285,8 @@ string Register::RegisterPage(){
                 goto bottom1;
             }
             else{
-                cout<<"Please write strong password"<<endl;
+                cout<<'\n';
+                cout<<"Please must contain special character like @,#,$,%,^,&,* ."<<endl;
                 goto specialLoop;
             }
 
@@ -298,11 +304,15 @@ string Register::RegisterPage(){
             // Pin must be four digit
 
             obj.pin=asterik(obj.pin);
+            cout<<'\n';
+            cout<<obj.pin.size()<<endl;
 
             if(obj.pin.size()==4){
                 goto bottom2;
             }
             else{
+                cout<<'\n';
+                obj.pin.clear();
                 cout<<"Pin must be in 4 digit"<<endl;
                 goto bottom1;
             }
@@ -315,8 +325,13 @@ string Register::RegisterPage(){
 
             cin.ignore(numeric_limits<streamsize>::max(),'\n');
 
+            if(obj.imei_no.size()>15){
+                cout<<"Imei number must be equal to 15 character"<<endl;
+                goto bottom2;
+            }
+
             if(obj.imei_no.size()<15){
-                cout<<"Imei number must be greater than or equal to 15 character"<<endl;
+                cout<<"Imei number must be equal to 15 character"<<endl;
                 goto bottom2;
             }
 
@@ -330,19 +345,31 @@ string Register::RegisterPage(){
                 }
             }
 
+            loop_location:
 
-
-            //cout<<"Enter the location"<<endl;
-            //cin>>obj.location;
-            int unique_location= rand() % 100;  
-            obj.location = to_string(unique_location);
-            cout<<"your current location co-ordinate is"<<obj.location<<endl;
+            cout<<"Enter the location"<<endl;
+            cin>>obj.location;
+            //int unique_location= rand() % 100;
+            //srand(time(0));
+            //int unique_location=rand()%100;
+            //cout<<a<<endl;
+            //obj.location = to_string(unique_location);
+            cout<<"your current location co-ordinate is :"<<obj.location<<endl;
 
             //cin.ignore(numeric_limits<streamsize>::max(),'\n');
 
-            //cout<<"Enter the time"<<endl;
-            //cin>>obj.time;
-            obj.time=__TIME__;
+            cout<<"Enter the time"<<endl;
+            cin>>obj.time;
+            //obj.time=__TIME__;
+            /*
+            time_t now=time(0);
+            tm *ltm=localtime(&now);
+            int h,m,s;
+            h=ltm->tm_hour;
+            m=ltm->tm_min;
+            s=ltm->tm_sec;
+            obj.time=to_string(h);
+            */
             cout<<"your current time is "<<obj.time;
 
             cin.ignore(numeric_limits<streamsize>::max(),'\n');
@@ -400,6 +427,23 @@ string Register::RegisterPage(){
             // cout<<"Successfully Register"<<endl;
 
             database_file.close();
+
+
+            log_file.close();
+            log_file.open("logfiletest.txt",ios::out | ios::app);
+
+            log_file<<obj.user_name<<" ";
+            log_file<<str<<" ";
+            log_file<<obj.user_id<<" ";
+            log_file<<obj.email_id<<" ";
+            log_file<<obj.password<<" ";
+            log_file<<obj.pin<<" ";
+            log_file<<obj.imei_no<<" ";
+            log_file<<obj.location<<" ";
+            log_file<<obj.time<<" ";
+            log_file<<endl;
+
+            log_file.close();
 
             return "Successful";
             }
