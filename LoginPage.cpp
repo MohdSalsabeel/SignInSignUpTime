@@ -43,15 +43,13 @@ string LoginPage::login(){
         std::ifstream database_file;
         database_file.open("databaseRecordtest.txt",ios::in);
         std::string word;
+    
+        fstream log_file;
+        log_file.open("logfiletest.txt", ios::in);
 
-        // Creating the new database file
-        std::ofstream new_database_file;
-        new_database_file.open("newDatabaseRecordtest.txt",ios::out);
 
-        // We are taking input from user
-        // static string login_user_id;
-        // string login_password;
-        // string login_time;
+        fstream login_file;
+        login_file.open("loginfiletest.txt",ios::out | ios::app | ios::in);
         
         cout<<"Enter login user id: "<<endl;
         cin>>login_user_id;
@@ -63,6 +61,17 @@ string LoginPage::login(){
         //cout<<"Your current login time: "<<endl;
         //cin>>login_time;
         //login_time=__TIME__;
+    
+        if(log_file.is_open()){
+            while(log_file>> user_name>> mobile_no>> user_id>> email_id>> password>> pin>> imei_no>> location>> time){
+
+                if(login_user_id==user_id && login_password==password){
+                    login_file<<user_name <<" "<< mobile_no <<" "<< user_id <<" "<< email_id <<" "<< password <<" "<< pin <<" "<< imei_no <<" "<< location <<" "<< time <<endl;
+                }
+            }
+        }
+
+        log_file.close();
 
         // Here we are reading the file (databaseRecordtest)
         if(database_file.is_open()){
@@ -70,10 +79,7 @@ string LoginPage::login(){
                 
                 if(encrypt(login_user_id)==user_id && encrypt(login_password)==password){
                     
-                    new_database_file<< user_name <<" "<< mobile_no <<" "<< user_id <<" "<< email_id <<" "<< password <<" "<< pin <<" "<< imei_no <<" "<< location <<" "<< time <<endl;
-                    while(database_file>>user_name>>mobile_no>>user_id>>email_id>>password>>pin>>imei_no>>location>>time){
-                        new_database_file<< user_name <<" "<< mobile_no <<" "<< user_id <<" "<< email_id <<" "<< password <<" "<< pin <<" "<< imei_no <<" "<< location <<" "<< time <<endl;
-                    }
+                    
                     return "Successful";
                 }
 
